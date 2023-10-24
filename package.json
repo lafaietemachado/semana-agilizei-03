@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "cypress:run:mobile": "npx cypress run -- config viewportWidth=411, viewportWidth=823",
+    "cypress:run": "npx cypress run"
   },
   "keywords": [],
   "author": "",
