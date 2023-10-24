@@ -1,13 +1,17 @@
 /// <reference types="cypress" />
 
-import { format } from '../support/util'
+import { format, prepareLocalStorage } from '../support/util'
 
 context('Dev Finances Agilizei', () => {
   
     beforeEach(() => {
-        cy.visit('https://devfinance-agilizei.netlify.app/')
-
-        cy.get('#data-table tbody tr').should('have.length', 0)
+        cy.visit('https://devfinance-agilizei.netlify.app/', {
+            onBeforeLoad: (win) => {
+                prepareLocalStorage(win)
+            }
+        })
+        
+        //cy.get('#data-table tbody tr').should('have.length', 0)
     })
     it('Cadastrar entradas', () => {
         
@@ -17,7 +21,7 @@ context('Dev Finances Agilizei', () => {
         cy.get('[type=date]').type('2023-10-15')
         cy.get('button').contains('Salvar').click()
 
-        cy.get('#data-table tbody tr').should('have.length', 1)
+        cy.get('#data-table tbody tr').should('have.length', 3)
     })
 
     it('Cadastrar saídas', () => {
@@ -28,53 +32,25 @@ context('Dev Finances Agilizei', () => {
         cy.get('[type=date]').type('2023-10-15')
         cy.get('button').contains('Salvar').click()
 
-        cy.get('#data-table tbody tr').should('have.length', 1)
+        cy.get('#data-table tbody tr').should('have.length', 3)
     })
 
     it('Remover entradas e saidas', () => {
-        const entrada = 'Mesada'
-        const saida = 'KinderOvo'
-
-        cy.get('#transaction .button').click()
-        cy.get('#description').type(entrada)
-        cy.get('[name=amount]').type(120)
-        cy.get('[type=date]').type('2023-10-15')
-        cy.get('button').contains('Salvar').click()
-
-        cy.get('#transaction .button').click()
-        cy.get('#description').type(saida)
-        cy.get('[name=amount]').type(-35)
-        cy.get('[type=date]').type('2023-10-15')
-        cy.get('button').contains('Salvar').click()
-
+    
         //estrategia 1: voltar para elemento pai, e avançar para um td img attr
 
-        cy.get('td.description').contains(entrada).parent().find('img[onclick*=remove]').click()
+        cy.get('td.description').contains("Mesada").parent().find('img[onclick*=remove]').click()
 
         // estrategia 2: buscar todos os irmãos, e buscar o que tem img + attr
 
-        cy.get('td.description').contains(saida).siblings().children('img[onclick*=remove]').click()
+        cy.get('td.description').contains('Suco Kapo').siblings().children('img[onclick*=remove]').click()
 
         cy.get('#data-table tbody tr').should('have.length', 0)
 
     })
 
-    it.only('Validar saldo com diversas transações', () => {
-        const entrada = 'Mesada'
-        const saida = 'KinderOvo'
-
-        cy.get('#transaction .button').click()
-        cy.get('#description').type(entrada)
-        cy.get('[name=amount]').type(120)
-        cy.get('[type=date]').type('2023-10-15')
-        cy.get('button').contains('Salvar').click()
-
-        cy.get('#transaction .button').click()
-        cy.get('#description').type(saida)
-        cy.get('[name=amount]').type(-35)
-        cy.get('[type=date]').type('2023-10-15')
-        cy.get('button').contains('Salvar').click()
-
+    it('Validar saldo com diversas transações', () => {
+        
         let incomes = 0
         let expenses =0
 
